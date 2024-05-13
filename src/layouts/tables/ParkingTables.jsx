@@ -170,6 +170,7 @@ function ParkingTables() {
                                     coloredShadow="info"
                                     display="flex"
                                     justifyContent="space-between"
+                                    alignItems="center"
                                 >
                                     <MDTypography variant="h6" color="white">
                                         Parking Details

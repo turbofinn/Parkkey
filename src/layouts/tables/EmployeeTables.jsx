@@ -27,8 +27,8 @@ import team4 from "assets/images/team-4.jpg";
 
 import apiService from "ApiServices/ApiService";
 import axios from 'axios';
-
-
+import ETDialog from "components/ETDialog/ETDialog";
+import AddLocationIcon from '@mui/icons-material/AddLocation';
 
 function EmployeeTables() {
     const [employeeDetails, setemployeeDetails] = useState(["1", "2", "3"]);
@@ -45,7 +45,11 @@ function EmployeeTables() {
             </MDBox>
         </MDBox>
     );
-
+    const [etDialog, setetDialog] = useState({
+        open: false,
+        fullWidth: false,
+        maxWidth: "ld"
+    });
     const Address = ({ description }) => (
         <MDBox lineHeight={1} textAlign="left">
             <MDTypography variant="caption">{description}</MDTypography>
@@ -91,7 +95,9 @@ function EmployeeTables() {
 
     const { columns: pColumns, rows: pRows } = projectsTableData();
 
+    const createNewEmployee = () => {
 
+    }
     useEffect(() => {
         fetchData()
 
@@ -113,46 +119,71 @@ function EmployeeTables() {
     };
 
     return (
-        <DashboardLayout>
-            <DashboardNavbar />
-            <MDBox pt={6} pb={3}>
-                <Grid container spacing={6}>
-                    <Grid item xs={12}>
-                        <Card>
-                            <MDBox
-                                mx={2}
-                                mt={-3}
-                                py={3}
-                                px={2}
-                                variant="gradient"
-                                bgColor="info"
-                                borderRadius="lg"
-                                coloredShadow="info"
-                            >
-                                <MDTypography variant="h6" color="white">
-                                    Employees Details
-                                </MDTypography>
-                            </MDBox>
-                            <MDBox pt={3}>
-                                {loading ?
-                                    <CircularProgress /> :
-                                    <DataTable
-                                        table={{ columns, rows }}
-                                        isSorted={false}
-                                        entriesPerPage={false}
-                                        showTotalEntries={false}
-                                        noEndBorder
-                                    />}
-                            </MDBox>
-                        </Card>
-                    </Grid>
+        <>
+            {etDialog && etDialog.open && <ETDialog
+                open={etDialog.open}
+                maxWidth={etDialog.maxWidth}
+                fullWidth={etDialog.fullWidth}
+                setetDialog={setetDialog}
+                component={createNewEmployee()}
+            />
+            }
+            <DashboardLayout>
+                <DashboardNavbar />
+                <MDBox pt={6} pb={3}>
+                    <Grid container spacing={6}>
+                        <Grid item xs={12}>
+                            <Card>
+                                <MDBox
+                                    mx={2}
+                                    mt={-3}
+                                    py={3}
+                                    px={2}
+                                    variant="gradient"
+                                    bgColor="info"
+                                    borderRadius="lg"
+                                    coloredShadow="info"
+                                    display="flex"
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                >
+                                    <MDTypography variant="h6" color="white">
+                                        Employees Details
+                                    </MDTypography>
+                                    <AddLocationIcon onClick={() => {
+                                        setetDialog(prevState => ({
+                                            ...prevState,
+                                            open: true
+                                        }))
+                                    }}
+                                        color="white" fontSize="large"
+                                        sx={{
+                                            '&:hover': {
+                                                cursor: 'pointer',
+                                            },
+                                        }} />
+                                </MDBox>
+                                <MDBox pt={3}>
+                                    {loading ?
+                                        <CircularProgress /> :
+                                        <DataTable
+                                            table={{ columns, rows }}
+                                            isSorted={false}
+                                            entriesPerPage={false}
+                                            showTotalEntries={false}
+                                            noEndBorder
+                                        />}
+                                </MDBox>
+                            </Card>
+                        </Grid>
 
-                </Grid>
-            </MDBox>
-            <div style={{ position: "fixed", bottom: "0", width: "80%", zIndex: "100", marginBottom: "1%" }}>
-                <Footer />
-            </div>
-        </DashboardLayout>
+                    </Grid>
+                </MDBox>
+                <div style={{ position: "fixed", bottom: "0", width: "80%", zIndex: "100", marginBottom: "1%" }}>
+                    <Footer />
+                </div>
+            </DashboardLayout>
+        </>
     );
 }
 
