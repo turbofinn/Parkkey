@@ -25,14 +25,16 @@ import AddLocationIcon from '@mui/icons-material/AddLocation';
 import TFDialog from "components/TFDialog/TFDialog";
 import { Button, TextField, Typography } from "@mui/material";
 import { TextFields } from "@mui/icons-material";
-
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 function ParkingTables() {
     const [parkingDetailsList, setparkingDetailsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-
+    const [loader, setloader] = useState({
+        open: false
+    });
     const [tfDialog, settfDialog] = useState({
         open: false,
         fullWidth: false,
@@ -70,7 +72,7 @@ function ParkingTables() {
     parkingDetailsList && parkingDetailsList.length > 0 && parkingDetailsList.map((data, index) => {
         console.log("data", data)
         rows.push({
-            Name: <Name image={parkey} name={data.parkingName} style={{fontSize:'sm'}} />,
+            Name: <Name image={parkey} name={data.parkingName} style={{ fontSize: 'sm' }} />,
             location: <Address description={data.location} />,
             status: (
                 <MDBox ml={-1}>
@@ -111,6 +113,7 @@ function ParkingTables() {
 
     const fetchData = async () => {
         try {
+            setloader(true);
             const response = await axios.get('https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/vendor/fetch-all-parking-space/d7e4e25e-8bb2-480e-a807-5e5eb8342ce9', {
                 headers: {
                     Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE"
@@ -118,9 +121,11 @@ function ParkingTables() {
             });
             setparkingDetailsList(response.data);
             setLoading(false);
+            setloader(false);
         } catch (error) {
             setError(error);
             setLoading(false);
+            setloader(false);
         }
     };
 
@@ -144,20 +149,39 @@ function ParkingTables() {
 
     return (
         <>
+            {loader && loader.open && (<Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 9999,
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                }}
+            >
+                <CircularProgress />
+            </Box>)
+            }
             {tfDialog && tfDialog.open && <TFDialog
                 open={tfDialog.open}
                 maxWidth={tfDialog.maxWidth}
                 fullWidth={tfDialog.fullWidth}
                 settfDialog={settfDialog}
                 component={createNewParking()}
+                setloader={setloader}
             />
 
             }
             <DashboardLayout>
                 <DashboardNavbar />
                 <MDBox pt={6} pb={3}>
-                    <Grid container spacing={6}>
-                        <Grid item xs={12}>
+                    <Grid container spacing={5}>
+                        <Grid item xs={13}>
                             <Card>
                                 <MDBox
                                     mx={2}
@@ -191,43 +215,32 @@ function ParkingTables() {
 
                                 </MDBox>
                                 <MDBox pt={3}>
-                                    <DataTable
-                                        table={{ columns, rows }}
-                                        isSorted={false}
-                                        entriesPerPage={false}
-                                        showTotalEntries={false}
-                                        noEndBorder
-                                    />
+                                    {loading ?
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                position: 'absolute',
+                                                left: 0,
+                                                right: 0,
+                                                zIndex: 9999,
+                                                backgroundColor: 'rgba(0, 0, 0, 0)',
+                                            }}
+                                        >
+                                            <CircularProgress />
+                                        </Box> :
+                                        <DataTable
+                                            table={{ columns, rows }}
+                                            isSorted={false}
+                                            entriesPerPage={false}
+                                            showTotalEntries={false}
+                                            noEndBorder
+                                        />
+                                    }
                                 </MDBox>
                             </Card>
                         </Grid>
-                        {/* <Grid item xs={12}>
-                        <Card>
-                            <MDBox
-                                mx={2}
-                                mt={-3}
-                                py={3}
-                                px={2}
-                                variant="gradient"
-                                bgColor="info"
-                                borderRadius="lg"
-                                coloredShadow="info"
-                            >
-                                <MDTypography variant="h6" color="white">
-                                    Projects Table
-                                </MDTypography>
-                            </MDBox>
-                            <MDBox pt={3}>
-                                <DataTable
-                                    table={{ columns: pColumns, rows: pRows }}
-                                    isSorted={false}
-                                    entriesPerPage={false}
-                                    showTotalEntries={false}
-                                    noEndBorder
-                                />
-                            </MDBox>
-                        </Card>
-                    </Grid> */}
                     </Grid>
 
 
