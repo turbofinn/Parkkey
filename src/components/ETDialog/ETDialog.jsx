@@ -15,7 +15,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from "axios";
 const ETDialog = (props) => {
     const [open, setOpen] = React.useState(false);
@@ -36,9 +36,18 @@ const ETDialog = (props) => {
     const handleClose = () => {
         props.setetDialog(prevState => ({
             ...prevState,
-            open: false
+            createopen: false,
+            editopen: false
         }))
     };
+
+    useEffect(() => {
+        if (props.editemployee !== null) {
+            setName(props.editemployee.employeeName);
+            setMobileNo(props.editemployee.mobileNo);
+            setGender(props.editemployee.gender);
+        }
+    }, []);
 
     const handleSubmit = async () => {
         const url = "https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/employee-onboarding";
@@ -48,33 +57,34 @@ const ETDialog = (props) => {
             "parkingSpaceID": "d071d97b-5130-4fb6-8c46-be6178c7206c",
             "mobileNo": mobileNo,
             "gender": gender
-          };
-          const headers = {
+        };
+        const headers = {
             "Content-Type": "application/json",
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE"
-          };
+        };
 
-          try {
+        try {
             const response = await axios.post(url, data, { headers });
             console.log("response", response);
             handleClose();
-          } catch (error) {
+        } catch (error) {
             console.error(error);
-          }
+        }
+    }
 
-        // console.log("name", name);
-        // console.log("name", mobileNo);
-        // console.log("name", gender);
+    const handleUpdate = () =>{
+        
     }
     return (
         <React.Fragment>
             <Dialog
                 fullWidth={fullWidth}
                 maxWidth={maxWidth}
-                open={props.open}
+                open={props.createopen || props.editopen}
                 onClose={handleClose}
             >
-                <DialogTitle style={{ color: '#007FFF' }} >Add New Employee</DialogTitle>
+                {props.createopen && (<DialogTitle style={{ color: '#007FFF' }} >Add New Employee</DialogTitle>)}
+                {props.editopen && (<DialogTitle style={{ color: '#007FFF' }} >Edit Employee Details</DialogTitle>)}
                 <DialogContent>
                     <Grid container spacing={2} justifyContent="evenly" alignItems="center" style={{ marginTop: '2px', marginBottom: '2px' }} >
                         <Grid item xs={3}>
@@ -87,6 +97,7 @@ const ETDialog = (props) => {
                                 id="outlined-size-small"
                                 placeholder="name"
                                 size="small"
+                                value={name}
                                 onChange={(e) => { setName(e.target.value) }}
                             />
                         </Grid>
@@ -102,6 +113,7 @@ const ETDialog = (props) => {
                                 id="outlined-size-small"
                                 placeholder="mobile no"
                                 size="small"
+                                value={mobileNo}
                                 onChange={(e) => { setMobileNo(e.target.value) }}
                             />
                         </Grid>
@@ -131,6 +143,7 @@ const ETDialog = (props) => {
                                 id="outlined-size-small"
                                 placeholder="gender"
                                 size="small"
+                                value={gender}
                                 onChange={(e) => { setGender(e.target.value) }}>
                                 <MenuItem value="Male">Male</MenuItem>
                                 <MenuItem value="Female">Female</MenuItem>
@@ -158,12 +171,22 @@ const ETDialog = (props) => {
 
                 </DialogContent>
                 <DialogActions>
-                    <Stack direction="row" spacing={2}>
-                        <Button
-                            variant="contained"
-                            style={{ color: 'white' }}
-                            onClick={handleSubmit}>Submit</Button>
-                    </Stack>
+                    {props.createopen &&
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="contained"
+                                style={{ color: 'white' }}
+                                onClick={handleSubmit}>Submit</Button>
+                        </Stack>
+                    }
+                    {props.editopen &&
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="contained"
+                                style={{ color: 'white' }}
+                                onClick={handleUpdate}>Update</Button>
+                        </Stack>
+                    }
                     <Button onClick={handleClose}>Close</Button>
                 </DialogActions>
             </Dialog>

@@ -35,7 +35,7 @@ function EmployeeTables() {
     const [employeeDetails, setemployeeDetails] = useState(["1", "2", "3"]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const [editemployee, setEditemployee] = useState(null);
     const Name = ({ image, name, email }) => (
         <MDBox display="flex" alignItems="center" lineHeight={1}>
             <MDAvatar src={image} name={name} size="sm" />
@@ -47,7 +47,8 @@ function EmployeeTables() {
         </MDBox>
     );
     const [etDialog, setetDialog] = useState({
-        open: false,
+        editopen:false,
+        createopen: false,
         fullWidth: false,
         maxWidth: "ld"
     });
@@ -86,7 +87,14 @@ function EmployeeTables() {
                 </MDTypography>
             ),
             action: (
-                <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+                <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium"
+                onClick={()=>{
+                    setetDialog(prevState => ({
+                        ...prevState,
+                        editopen: true
+                    }));
+                    setEditemployee(employeeDetails[index]);
+                }}>
                     Edit
                 </MDTypography>
             ),
@@ -113,6 +121,7 @@ function EmployeeTables() {
             });
             setemployeeDetails(response.data);
             setLoading(false);
+            console.log("response", response.data);
         } catch (error) {
             setError(error);
             setLoading(false);
@@ -121,12 +130,16 @@ function EmployeeTables() {
 
     return (
         <>
-            {etDialog && etDialog.open && <ETDialog
-                open={etDialog.open}
+            {etDialog && (etDialog.createopen || etDialog.editopen) && <ETDialog
+                editopen={etDialog.editopen}
+                createopen={etDialog.createopen}
                 maxWidth={etDialog.maxWidth}
                 fullWidth={etDialog.fullWidth}
                 setetDialog={setetDialog}
                 component={createNewEmployee()}
+                employeeDetails={employeeDetails}
+                setEditemployee={setEditemployee}
+                editemployee={editemployee}
             />
             }
             <DashboardLayout>
@@ -154,7 +167,7 @@ function EmployeeTables() {
                                     <AddLocationIcon onClick={() => {
                                         setetDialog(prevState => ({
                                             ...prevState,
-                                            open: true
+                                            createopen: true
                                         }))
                                     }}
                                         color="white" fontSize="large"
@@ -194,9 +207,9 @@ function EmployeeTables() {
 
                     </Grid>
                 </MDBox>
-                <div style={{ position: "fixed", bottom: "0", width: "80%", zIndex: "100", marginBottom: "1%" }}>
+                {/* <div style={{ position: "fixed", bottom: "0", width: "80%", zIndex: "100", marginBottom: "1%" }}>
                     <Footer />
-                </div>
+                </div> */}
             </DashboardLayout>
         </>
     );

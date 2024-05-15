@@ -30,17 +30,18 @@ import Box from '@mui/material/Box';
 
 function ParkingTables() {
     const [parkingDetailsList, setparkingDetailsList] = useState([]);
+    const [editparkingDetails, seteditparkingDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [loader, setloader] = useState({
         open: false
     });
     const [tfDialog, settfDialog] = useState({
-        open: false,
+        editopen:false,
+        createopen: false,
         fullWidth: false,
         maxWidth: "ld"
     });
-
     const Name = ({ image, name, email }) => (
         <MDBox display="flex" alignItems="center" lineHeight={1}>
             <MDAvatar src={image} name={name} size="sm" />
@@ -99,7 +100,15 @@ function ParkingTables() {
                 </MDTypography>
             ),
             action: (
-                <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+                <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium"
+                onClick={() => {
+                    settfDialog(prevState => ({
+                        ...prevState,
+                        editopen: true
+                    }));
+                    seteditparkingDetails(parkingDetailsList[index]);
+                    console.log("details",parkingDetailsList[index]);
+                }} >
                     Edit
                 </MDTypography>
             ),
@@ -131,6 +140,7 @@ function ParkingTables() {
 
     const createNewParking = () => {
         return (<>
+        
             <div style={{ color: "grey", width: "100%" }}>Add New Parking</div>
             <hr />
             <div style={{ display: "flex", width: "100%" }}>
@@ -167,10 +177,13 @@ function ParkingTables() {
                 <CircularProgress />
             </Box>)
             }
-            {tfDialog && tfDialog.open && <TFDialog
-                open={tfDialog.open}
+            {tfDialog && (tfDialog.createopen || tfDialog.editopen) && <TFDialog
+                editopen={tfDialog.editopen}
+                createopen={tfDialog.createopen}
                 maxWidth={tfDialog.maxWidth}
                 fullWidth={tfDialog.fullWidth}
+                editparkingDetails={editparkingDetails}
+                seteditparkingDetails={seteditparkingDetails}
                 settfDialog={settfDialog}
                 component={createNewParking()}
                 setloader={setloader}
@@ -203,7 +216,7 @@ function ParkingTables() {
                                     <AddLocationIcon onClick={() => {
                                         settfDialog(prevState => ({
                                             ...prevState,
-                                            open: true
+                                            createopen: true
                                         }))
                                     }}
                                         color="white" fontSize="large"
@@ -245,9 +258,9 @@ function ParkingTables() {
 
 
                 </MDBox>
-                <div style={{ position: "fixed", bottom: "0", width: "80%", zIndex: "100", marginBottom: "1%" }}>
+                {/* <div style={{ position: "fixed", bottom: "0", width: "80%", zIndex: "100", marginBottom: "1%" }}>
                     <Footer />
-                </div>
+                </div> */}
             </DashboardLayout>
         </>
     );
