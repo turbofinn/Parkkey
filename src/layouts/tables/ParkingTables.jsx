@@ -37,30 +37,32 @@ function ParkingTables() {
         open: false
     });
     const [tfDialog, settfDialog] = useState({
-        editopen:false,
+        editopen: false,
         createopen: false,
         fullWidth: false,
         maxWidth: "ld"
     });
-    const Name = ({ image, name, email }) => (
+    const Name = ({ image, name, email, description }) => (
         <MDBox display="flex" alignItems="center" lineHeight={1}>
             <MDAvatar src={image} name={name} size="sm" />
             <MDBox ml={2} lineHeight={1}>
                 <MDTypography display="block" variant="button" fontWeight="medium">
                     {name}
                 </MDTypography>
+                <MDBox lineHeight={1} textAlign="left">
+                    <MDTypography variant="caption">{description}</MDTypography>
+                </MDBox>
             </MDBox>
         </MDBox>
+
     );
 
-    const Address = ({ description }) => (
-        <MDBox lineHeight={1} textAlign="left">
-            <MDTypography variant="caption">{description}</MDTypography>
-        </MDBox>
-    );
+    // const Address = ({ description }) => (
+       
+    // );
     var columns = [
         { Header: "Name", accessor: "Name", width: "10%", align: "left" },
-        { Header: "location", accessor: "location", width: "10%", align: "left" },
+        // { Header: "location", accessor: "location", width: "10%", align: "left" },
         { Header: "status", accessor: "status", width: "10%", align: "center" },
         { Header: "totalSpace", accessor: "totalSpace", width: "10%", align: "center" },
         { Header: "availableSpace", accessor: "availableSpace", width: "10%", align: "center" },
@@ -73,8 +75,8 @@ function ParkingTables() {
     parkingDetailsList && parkingDetailsList.length > 0 && parkingDetailsList.map((data, index) => {
         console.log("data", data)
         rows.push({
-            Name: <Name image={parkey} name={data.parkingName} style={{ fontSize: 'sm' }} />,
-            location: <Address description={data.location} />,
+            Name: <Name image={parkey} name={data.parkingName} description={data.location} style={{ fontSize: 'sm' }} />,
+            // location: <Address  />,
             status: (
                 <MDBox ml={-1}>
                     <MDBadge badgeContent={data.parkingSpaceStatus} color={data.parkingSpaceStatus === "Active" ? "success" : "error"} variant="gradient" size="sm" />
@@ -101,14 +103,14 @@ function ParkingTables() {
             ),
             action: (
                 <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium"
-                onClick={() => {
-                    settfDialog(prevState => ({
-                        ...prevState,
-                        editopen: true
-                    }));
-                    seteditparkingDetails(parkingDetailsList[index]);
-                    console.log("details",parkingDetailsList[index]);
-                }} >
+                    onClick={() => {
+                        settfDialog(prevState => ({
+                            ...prevState,
+                            editopen: true
+                        }));
+                        seteditparkingDetails(parkingDetailsList[index]);
+                        console.log("details", parkingDetailsList[index]);
+                    }} >
                     Edit
                 </MDTypography>
             ),
@@ -140,7 +142,7 @@ function ParkingTables() {
 
     const createNewParking = () => {
         return (<>
-        
+
             <div style={{ color: "grey", width: "100%" }}>Add New Parking</div>
             <hr />
             <div style={{ display: "flex", width: "100%" }}>

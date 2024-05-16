@@ -55,6 +55,8 @@ import brandDark from "assets/images/onlpLogo.png";
 import brandWhite from "assets/images/onlpLogo.png";
 
 export default function App() {
+  const token = localStorage.getItem("token");
+  console.log("token", token);
   const [controller, dispatch] = useMaterialUIController();
   const {
     miniSidenav,
@@ -147,32 +149,7 @@ export default function App() {
     </MDBox>
   );
 
-  return direction === "rtl" ? (
-    <CacheProvider value={rtlCache}>
-      <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
-        <CssBaseline />
-        {layout === "dashboard" && (
-          <>
-            <Sidenav
-              color={sidenavColor}
-              brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-              brandName="Parkkey"
-              routes={routes}
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
-            />
-            <Configurator />
-            {configsButton}
-          </>
-        )}
-        {layout === "vr" && <Configurator />}
-        <Routes>
-          {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </ThemeProvider>
-    </CacheProvider>
-  ) : (
+  return (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       {layout === "dashboard" && (
@@ -192,7 +169,14 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route
+          path="/"
+          element={token ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />}
+        />
+        <Route
+          path="*"
+          element={token ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />}
+        />
       </Routes>
     </ThemeProvider>
   );

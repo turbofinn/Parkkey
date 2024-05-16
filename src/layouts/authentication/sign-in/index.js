@@ -13,8 +13,8 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import axios from "axios";
 // react-router-dom components
 import { Link } from "react-router-dom";
 
@@ -23,7 +23,7 @@ import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
 import MuiLink from "@mui/material/Link";
-
+import { useNavigate } from "react-router-dom";
 // @mui icons
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GitHubIcon from "@mui/icons-material/GitHub";
@@ -34,7 +34,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-
+import CircularProgress from '@mui/material/CircularProgress';
 // Authentication layout components
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 
@@ -42,12 +42,86 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/parking.png";
 import parkkey from "assets/images/parkkey.png";
 import { Button, Typography } from "@mui/material";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import SuccessDialog from "components/SuccessDialog/SuccessDialog";
 
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);
+  const [mobile, setMobile] = useState('');
+  const [OTP, setOTP] = useState('');
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const Navigate = useNavigate();
 
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+  const sendOTP = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        'https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/login-service/send-otp',
+        { mobileNo: mobile },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE'
+          }
+        }
+      ).then((res) => {
+        console.log("res", res);
+        handleClick();
+        setLoading(false)
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
 
+  const verifyOTP = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        'https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/login-service/verify-otp/vendor',
+        {
+          mobileNo: mobile,
+          otp: OTP
+        }
+        // {
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE'
+        //   }
+        // }
+      ).then((res) => {
+        if(res.data.status.code === 1001){
+             localStorage.setItem("token", res.data.token);
+             localStorage.setItem("refresh_token", res.data.refreshToken);
+             localStorage.setItem("vendorID", res.data.vendor.vendorID);
+             Navigate("/dashboard");
+        }
+        setLoading(false);
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+  useEffect(() => {
+    if (mobile.length == 10) {
+      sendOTP();
+    }
+  }, [mobile]);
   return (
     <BasicLayout image={bgImage}>
       <Card>
@@ -62,9 +136,19 @@ function Basic() {
           mb={1}
           textAlign="center"
         >
-         
+          {/* <SuccessDialog/> */}
+          <Snackbar open={open} autoHideDuration={8000} onClose={handleClose}>
+            <Alert
+              onClose={handleClose}
+              severity="success"
+              variant="filled"
+              sx={{ width: '100%' }}
+            >
+              OTP send to your Mobile No. successfully
+            </Alert>
+          </Snackbar>
           <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
-          <img src={parkkey} style={{width:"25%",marginLeft:"5%"}} ></img>
+            <img src={parkkey} style={{ width: "25%", marginLeft: "5%" }} ></img>
           </Grid>
           <Typography variant="h4" fontWeight="medium" color="#0f7002" mt={1}>
             Sign in
@@ -72,48 +156,27 @@ function Basic() {
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form">
+
+
             <MDBox mb={2}>
-              <MDInput type="Mobile No" label="Mobile No" fullWidth />
+              <MDInput type="Mobile No" inputProps={{ maxLength: 10 }} label="Mobile No" fullWidth
+                onChange={(e) => { setMobile(e.target.value) }}
+                value={mobile} />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
+              <MDInput type="OTP" inputProps={{ maxLength: 4 }} label="OTP" fullWidth
+                onChange={(e) => { setOTP(e.target.value) }} />
             </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-              >
-                &nbsp;&nbsp;Remember me
-              </MDTypography>
-            </MDBox>
+
             <MDBox mt={4} mb={1}>
-            <Link to="/dashboard/">
-            
-            <Button style={{color:"#fff",background:"#0f7002"}} fullWidth >  
-          
-              Sign in 
-              </Button>
-            </Link>
-           
-            </MDBox>
-            <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
-                Don&apos;t have an account?{" "}
-                <Typography
-                  component={Link}
-                  to="/authentication/sign-up"
-                  variant="button"
-                  color="#0f7002"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  Sign up
-                </Typography>
-              </MDTypography>
+                <Button style={{ color: "#fff", background: "#0f7002", cursor:"pointer" }} fullWidth
+                 onClick={verifyOTP}>
+                  {loading ?
+                    <CircularProgress style={{ color: "#fff" }} size="30px" />
+                    :
+                    <p>Verify OTP</p>
+                  }
+                </Button>
             </MDBox>
           </MDBox>
         </MDBox>

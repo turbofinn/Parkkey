@@ -38,11 +38,12 @@ const ETDialog = (props) => {
             ...prevState,
             createopen: false,
             editopen: false
-        }))
+        }));
+        props.setEditemployee(() => null);
     };
 
     useEffect(() => {
-        if (props.editemployee !== null) {
+        if (props && props.editemployee !== null) {
             setName(props.editemployee.employeeName);
             setMobileNo(props.editemployee.mobileNo);
             setGender(props.editemployee.gender);
@@ -72,8 +73,27 @@ const ETDialog = (props) => {
         }
     }
 
-    const handleUpdate = () =>{
-        
+    const handleUpdate = () => {
+    
+        const myHeaders = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE"
+        };
+
+        const data = {
+            employeeName: name,
+            mobileNo: mobileNo,
+            gender: gender,
+        };
+
+        axios.put(`https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/employee/update-employee-info/${props.editemployee.employeeID}`, data, { headers: myHeaders })
+            .then(response => {
+                console.log("response_data", response.data);
+                handleClose();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+        });
     }
     return (
         <React.Fragment>
