@@ -13,11 +13,21 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 // react-router-dom components
 import { useLocation, NavLink } from "react-router-dom";
-
+import Dashboard from "layouts/dashboard";
+import ParkingTables from "layouts/tables/ParkingTables";
+import VendorTables from "layouts/tables/VendorTables";
+import Billing from "layouts/billing";
+import RTL from "layouts/rtl";
+import Notifications from "layouts/notifications";
+import Profile from "layouts/profile";
+import SignIn from "layouts/authentication/sign-in";
+import SignUp from "layouts/authentication/sign-up";
+// import Icon from "@mui/material/Icon";
+import EmployeeTables from "layouts/tables/EmployeeTables";
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
 
@@ -47,7 +57,118 @@ import {
   setWhiteSidenav,
 } from "context";
 
+// const getRoutes = () => {
+//   const validatonID = localStorage.getItem("vendorID");
+//   const adminID = localStorage.getItem("adminID");
+  
+//   return [
+//     {
+//       type: "collapse",
+//       name: "Dashboard",
+//       key: "dashboard",
+//       icon: <Icon fontSize="small">dashboard</Icon>,
+//       route: "/dashboard",
+//       component: <Dashboard />,
+//       condition: true
+//     },
+//     {
+//       type: "collapse",
+//       name: "Employees",
+//       key: "Employees",
+//       icon: <Icon fontSize="small">table_view</Icon>,
+//       route: "/Employees",
+//       component: <EmployeeTables/>,
+//       condition: validatonID && !adminID
+//     },
+//     {
+//       type: "collapse",
+//       name: "Parkings",
+//       key: "Parkings",
+//       icon: <Icon fontSize="small">table_view</Icon>,
+//       route: "/Parkings",
+//       component: <ParkingTables />,
+//       condition: validatonID && !adminID
+//     },
+//     {
+//       type: "collapse",
+//       name: "Vendors",
+//       key: "Vendors",
+//       icon: <Icon fontSize="small">table_view</Icon>,
+//       route: "/Vendors",
+//       component: <VendorTables />,
+//       condition: !validatonID && adminID
+//     },
+//     {
+//       type: "collapse",
+//       name: "Billing",
+//       key: "billing",
+//       icon: <Icon fontSize="small">receipt_long</Icon>,
+//       route: "/billing",
+//       component: <Billing />,
+//       condition: true
+//     },
+//     // {
+//     //   type: "collapse",
+//     //   name: "RTL",
+//     //   key: "rtl",
+//     //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+//     //   route: "/rtl",
+//     //   component: <RTL />,
+//     // },
+//     // {
+//     //   type: "collapse",
+//     //   name: "Notifications",
+//     //   key: "notifications",
+//     //   icon: <Icon fontSize="small">notifications</Icon>,
+//     //   route: "/notifications",
+//     //   component: <Notifications />,
+//     // },
+//     {
+//       type: "collapse",
+//       name: "Profile",
+//       key: "profile",
+//       icon: <Icon fontSize="small">person</Icon>,
+//       route: "/profile",
+//       component: <Profile />,
+//       condition: true
+//     },
+//     {
+//       type: "collapse",
+//       name: "Sign In",
+//       key: "sign-in",
+//       icon: <Icon fontSize="small">login</Icon>,
+//       route: "/authentication/sign-in",
+//       component: <SignIn />,
+//       condition: true
+//     },
+//     // {
+//     //   type: "collapse",
+//     //   name: "Sign Up",
+//     //   key: "sign-up",
+//     //   icon: <Icon fontSize="small">assignment</Icon>,
+//     //   route: "/authentication/sign-up",
+//     //   component: <SignUp />,
+//     //   condition: true
+//     // },
+//   ].filter(route => route.condition);
+// }
+
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
+  // const [Routes, setRoutes] = useState(getRoutes);
+
+  // useEffect(() => {
+    // const handleStorageChange = () => {
+      // setRoutes(getRoutes());
+    // };
+
+    // window.addEventListener("storage", handleStorageChange);
+
+    // return () => {
+    //   window.removeEventListener("storage", handleStorageChange);
+    // };
+  // }, []);
+  // const filteredRoutes = routes.filter(route => route.condition);
+
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
   const location = useLocation();
@@ -189,7 +310,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           color={sidenavColor}
           fullWidth
         >
-         Contact Admin
+          Contact Admin
         </MDButton>
       </MDBox>
     </SidenavRoot>

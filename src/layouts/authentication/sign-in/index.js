@@ -46,6 +46,9 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import SuccessDialog from "components/SuccessDialog/SuccessDialog";
+import Stack from '@mui/material/Stack';
+
+// import Switch from '@mui/material/Switch';
 
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -54,6 +57,13 @@ function Basic() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const Navigate = useNavigate();
+
+  const [checked, setChecked] = useState(true);
+
+  const handleChange = (event) => {
+    setChecked(event.target.checked);
+    // console.log(event.target.checked);
+  };
 
   const handleClick = () => {
     setOpen(true);
@@ -66,7 +76,6 @@ function Basic() {
 
     setOpen(false);
   };
-  const handleSetRememberMe = () => setRememberMe(!rememberMe);
   const sendOTP = async () => {
     try {
       setLoading(true);
@@ -90,32 +99,54 @@ function Basic() {
   }
 
   const verifyOTP = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        'https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/login-service/verify-otp/vendor',
-        {
-          mobileNo: mobile,
-          otp: OTP
-        }
-        // {
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE'
-        //   }
-        // }
-      ).then((res) => {
-        if(res.data.status.code === 1001){
-             localStorage.setItem("token", res.data.token);
-             localStorage.setItem("refresh_token", res.data.refreshToken);
-             localStorage.setItem("vendorID", res.data.vendor.vendorID);
-             Navigate("/dashboard");
-        }
-        setLoading(false);
-      });
-    } catch (error) {
-      console.error('Error:', error);
+    if(checked){
+      try {
+        setLoading(true);
+        const response = await axios.post(
+          'https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/login-service/verify-otp/vendor',
+          {
+            mobileNo: mobile,
+            otp: OTP
+          }
+        ).then((res) => {
+          if (res.data.status.code === 1001) {
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("refresh_token", res.data.refreshToken);
+            localStorage.setItem("vendorID", res.data.vendor.vendorID);
+            Navigate("/dashboard");
+          }else{
+            Navigate("/authentication/sign-in");
+          }
+          setLoading(false);
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }else{
+      try {
+        setLoading(true);
+        const response = await axios.post(
+          'https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/login-service/verify-otp/admin',
+          {
+            mobileNo: mobile,
+            otp: OTP
+          }
+        ).then((res) => {
+          if (res.data.status.code === 1001) {
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("refresh_token", res.data.refreshToken);
+            localStorage.setItem("adminID", res.data.admin.adminID);
+            Navigate("/dashboard");
+          }else{
+            Navigate("/authentication/sign-in");
+          }
+          setLoading(false);
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
     }
+    
   }
   useEffect(() => {
     if (mobile.length == 10) {
@@ -167,16 +198,28 @@ function Basic() {
               <MDInput type="OTP" inputProps={{ maxLength: 4 }} label="OTP" fullWidth
                 onChange={(e) => { setOTP(e.target.value) }} />
             </MDBox>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Typography style={{ fontSize:"16px", color:"blue"}}>Admin</Typography>
+              <Switch
+                checked={checked}
+                onChange={handleChange}
+                inputProps={{ 'aria-label': 'controlled' }}
+                color="blue"
+              />
+              <Typography style={{ fontSize:"16px", color:"green"}}>Vendor</Typography>
+            </Stack>
+
+
 
             <MDBox mt={4} mb={1}>
-                <Button style={{ color: "#fff", background: "#0f7002", cursor:"pointer" }} fullWidth
-                 onClick={verifyOTP}>
-                  {loading ?
-                    <CircularProgress style={{ color: "#fff" }} size="30px" />
-                    :
-                    <p>Verify OTP</p>
-                  }
-                </Button>
+              <Button style={{ color: "#fff", background: "#0f7002", cursor: "pointer" }} fullWidth
+                onClick={verifyOTP}>
+                {loading ?
+                  <CircularProgress style={{ color: "#fff" }} size="30px" />
+                  :
+                  <p>Verify OTP</p>
+                }
+              </Button>
             </MDBox>
           </MDBox>
         </MDBox>
