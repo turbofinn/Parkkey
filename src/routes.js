@@ -11,8 +11,6 @@ import VendorTables from "layouts/tables/VendorTables";
 import Icon from "@mui/material/Icon";
 import EmployeeTables from "layouts/tables/EmployeeTables";
 
-const validatonID = localStorage.getItem("vendorID");
-const adminID = localStorage.getItem("adminID");
 const routes = [
   {
     type: "collapse",
@@ -21,7 +19,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-    condition: true
+    role: ["Admin","Vendor"]
   },
   {
     type: "collapse",
@@ -30,7 +28,7 @@ const routes = [
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/Employees",
     component: <EmployeeTables/>,
-    condition: validatonID && !adminID
+    role: ["Vendor"]
   },
   {
     type: "collapse",
@@ -39,7 +37,7 @@ const routes = [
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/Parkings",
     component: <ParkingTables />,
-    condition: validatonID && !adminID
+    role: ["Vendor"]
   },
   {
     type: "collapse",
@@ -48,7 +46,7 @@ const routes = [
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/Vendors",
     component: <VendorTables />,
-    condition: !validatonID && adminID
+    role: ["Admin"]
   },
   {
     type: "collapse",
@@ -57,7 +55,7 @@ const routes = [
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/billing",
     component: <Billing />,
-    condition: true
+    role: []
   },
   // {
   //   type: "collapse",
@@ -82,27 +80,27 @@ const routes = [
     icon: <Icon fontSize="small">person</Icon>,
     route: "/profile",
     component: <Profile />,
-    condition: true
+    role: []
   },
-  {
-    type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
-    condition: true
-  },
-  {
-    type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
-    condition: true
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Sign In",
+  //   key: "sign-in",
+  //   icon: <Icon fontSize="small">login</Icon>,
+  //   route: "/authentication/sign-in",
+  //   component: <SignIn />,
+  //   role: []
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Sign Up",
+  //   key: "sign-up",
+  //   icon: <Icon fontSize="small">assignment</Icon>,
+  //   route: "/authentication/sign-up",
+  //   component: <SignUp />,
+  //   role: []
+  // },
 ];
 
-const filteredRoutes = routes.filter(route => route.condition);
-export default filteredRoutes;
+
+export default routes;
