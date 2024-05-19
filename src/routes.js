@@ -11,13 +11,7 @@ import VendorTables from "layouts/tables/VendorTables";
 import Icon from "@mui/material/Icon";
 import EmployeeTables from "layouts/tables/EmployeeTables";
 
-<<<<<<< HEAD
-const validatonID = localStorage.getItem("vendorID");
-const adminID = localStorage.getItem("adminID");
-const routes = [          
-=======
 const routes = [
->>>>>>> e5fff1e040d3e5b4a46382c98ab6fba9c3d42b59
   {
     type: "collapse",
     name: "Dashboard",

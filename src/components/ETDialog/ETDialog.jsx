@@ -27,6 +27,9 @@ const ETDialog = (props) => {
     const [name, setName] = useState('');
     const [mobileNo, setMobileNo] = useState('');
     const [gender, setGender] = useState('');
+    const [parkingName, setParkingName] = useState('');
+    const [parkingList, setparkingList] = useState([]);
+    const [parkingIndex, setparkingIndex] = useState('');
 
 
 
@@ -55,22 +58,44 @@ const ETDialog = (props) => {
             setName(props.editemployee.employeeName);
             setMobileNo(props.editemployee.mobileNo);
             setGender(props.editemployee.gender);
+            // setparkingIndex(props.)
         }
     }, []);
+
+    const token = localStorage.getItem("token");
+    const vendorID = localStorage.getItem("vendorID");
+
+    useEffect(() => {
+        fetchParkingDetails();
+    }, []);
+    const fetchParkingDetails = async () => {
+        try {
+            const response = await axios.get(`https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/vendor/fetch-all-parking-space/${vendorID}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setparkingList(response.data);
+            console.log("list", response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
 
     const handleSubmit = async () => {
         handleLoader();
         const url = "https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/employee-onboarding";
         const data = {
-            "vendorID": "d7e4e25e-8bb2-480e-a807-5e5eb8342ce9",
+            "vendorID": `${vendorID}`,
             "employeeName": name,
-            "parkingSpaceID": "d071d97b-5130-4fb6-8c46-be6178c7206c",
+            "parkingSpaceID": parkingIndex,
             "mobileNo": mobileNo,
             "gender": gender
         };
         const headers = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE"
+            "Authorization": `Bearer ${token}`
         };
 
         try {
@@ -88,7 +113,7 @@ const ETDialog = (props) => {
         handleLoader();
         const myHeaders = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE"
+            "Authorization": `Bearer ${token}`
         };
 
         const data = {
@@ -167,6 +192,32 @@ const ETDialog = (props) => {
                                 <MenuItem value="Male">Male</MenuItem>
                                 <MenuItem value="Female">Female</MenuItem>
                                 {/* <MenuItem value="Others">Others</MenuItem> */}
+                            </Select>
+                        </Grid>
+                    </Grid>
+
+                    <Grid container spacing={2} justifyContent="evenly" alignItems="center" style={{ marginTop: '2px', marginBottom: '2px' }}>
+                        <Grid item xs={3}>
+                            <Typography variant="body1" style={{ fontSize: matches ? '0.85rem' : '0.95rem', fontFamily: 'inherit' }}>Parking Name</Typography>
+                        </Grid>
+                        <Grid item xs={8}>
+                            <Select style={{ margin: "1%", width: "100%", padding: matches ? "3%" : "2%" }}
+                                id="outlined-size-small"
+                                placeholder="parking name"
+                                size="small"
+                                value={parkingName}
+                                onChange={(e) => { 
+                                    setParkingName(e.target.value);
+                                }}>
+                                {
+                                    parkingList && parkingList.map((data, index) => {
+                                        return (
+                                            <MenuItem value={data.parkingName} onClick={()=>{
+                                                setparkingIndex(data.parkingSpaceID);
+                                            }}>{data.parkingName}</MenuItem>
+                                        )
+                                    }) 
+                                }
                             </Select>
                         </Grid>
                     </Grid>

@@ -52,7 +52,8 @@ export default function MaxWidthDialog(props) {
     }, []);
 
     const url = "https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/parking-space-onboarding";
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE";
+    const token = localStorage.getItem("token");
+    const vendorID = localStorage.getItem("vendorID");
     const names = [
         "Heavy",
         "Bike",
@@ -94,7 +95,7 @@ export default function MaxWidthDialog(props) {
     const handleSubmit = async () => {
         handleLoader();
         const data = {
-            vendorID: "d7e4e25e-8bb2-480e-a807-5e5eb8342ce9",
+            vendorID: vendorID,
             vehicleType: vehicle,
             parkingName: name,
             availableSpace: AvailableSpace,
@@ -122,9 +123,9 @@ export default function MaxWidthDialog(props) {
             console.error(error);
         }
     }
- 
 
-    const handleUpdate = () =>{
+
+    const handleUpdate = () => {
         handleLoader();
         const data = {
             parkingSpaceID: props.editparkingDetails.parkingSpaceID,
@@ -145,20 +146,23 @@ export default function MaxWidthDialog(props) {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
         };
+        // const getBaseUrl = () => { return process.env.REACT_APP_IS_IN_PROD === "true" ? process.env.REACT_APP_BASE_URL_PROD : process.env.REACT_APP_BASE_URL_DEV;
+        // }
+        // console.log("url", getBaseUrl);
         axios.put(
             `https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/parking-space/update-parking-space-info/${props.editparkingDetails.parkingSpaceID}`,
             data,
             { headers: headers }
-          )
-          .then((response) => {
-            handleClose();
-            console.log(response.data);
-            handleLoader();
-            props.fetchData();
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        )
+            .then((response) => {
+                handleClose();
+                console.log(response.data);
+                handleLoader();
+                props.fetchData();
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     }
     return (
         <React.Fragment>
@@ -409,7 +413,7 @@ export default function MaxWidthDialog(props) {
                 </DialogContent>
 
                 <DialogActions>
-                    {props.createopen && 
+                    {props.createopen &&
                         <Stack direction="row" spacing={2}>
                             <Button
                                 variant="contained"
@@ -417,7 +421,7 @@ export default function MaxWidthDialog(props) {
                                 onClick={handleSubmit}>Submit</Button>
                         </Stack>
                     }
-                    {props.editopen && 
+                    {props.editopen &&
                         <Stack direction="row" spacing={2}>
                             <Button
                                 variant="contained"
