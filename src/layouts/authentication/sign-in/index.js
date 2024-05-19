@@ -136,7 +136,7 @@ function Basic() {
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("refresh_token", res.data.refreshToken);
             localStorage.setItem("adminID", res.data.admin.adminID);
-            Navigate("/dashboard");
+       
           }else{
             Navigate("/authentication/sign-in");
           }

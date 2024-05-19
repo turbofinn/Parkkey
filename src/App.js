@@ -48,6 +48,7 @@ import routes from "routes";
 
 // Material Dashboard 2 React contexts
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
+import SignIn from "layouts/authentication/sign-in"
 
 // Images
 
@@ -166,11 +167,17 @@ export default function App() {
           {configsButton}
         </>
       )}
-      {layout === "vr" && <Configurator />}
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
+
+{!token ?<Routes>
+  <Route path="/authentication/sign-in" element={<SignIn />} />
+          <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+        </Routes>
+        :
+        <Routes>
+          {getRoutes(routes)}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+        }
     </ThemeProvider>
   );
 }

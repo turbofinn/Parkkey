@@ -57,101 +57,6 @@ import {
   setWhiteSidenav,
 } from "context";
 
-// const getRoutes = () => {
-//   const validatonID = localStorage.getItem("vendorID");
-//   const adminID = localStorage.getItem("adminID");
-  
-//   return [
-//     {
-//       type: "collapse",
-//       name: "Dashboard",
-//       key: "dashboard",
-//       icon: <Icon fontSize="small">dashboard</Icon>,
-//       route: "/dashboard",
-//       component: <Dashboard />,
-//       condition: true
-//     },
-//     {
-//       type: "collapse",
-//       name: "Employees",
-//       key: "Employees",
-//       icon: <Icon fontSize="small">table_view</Icon>,
-//       route: "/Employees",
-//       component: <EmployeeTables/>,
-//       condition: validatonID && !adminID
-//     },
-//     {
-//       type: "collapse",
-//       name: "Parkings",
-//       key: "Parkings",
-//       icon: <Icon fontSize="small">table_view</Icon>,
-//       route: "/Parkings",
-//       component: <ParkingTables />,
-//       condition: validatonID && !adminID
-//     },
-//     {
-//       type: "collapse",
-//       name: "Vendors",
-//       key: "Vendors",
-//       icon: <Icon fontSize="small">table_view</Icon>,
-//       route: "/Vendors",
-//       component: <VendorTables />,
-//       condition: !validatonID && adminID
-//     },
-//     {
-//       type: "collapse",
-//       name: "Billing",
-//       key: "billing",
-//       icon: <Icon fontSize="small">receipt_long</Icon>,
-//       route: "/billing",
-//       component: <Billing />,
-//       condition: true
-//     },
-//     // {
-//     //   type: "collapse",
-//     //   name: "RTL",
-//     //   key: "rtl",
-//     //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-//     //   route: "/rtl",
-//     //   component: <RTL />,
-//     // },
-//     // {
-//     //   type: "collapse",
-//     //   name: "Notifications",
-//     //   key: "notifications",
-//     //   icon: <Icon fontSize="small">notifications</Icon>,
-//     //   route: "/notifications",
-//     //   component: <Notifications />,
-//     // },
-//     {
-//       type: "collapse",
-//       name: "Profile",
-//       key: "profile",
-//       icon: <Icon fontSize="small">person</Icon>,
-//       route: "/profile",
-//       component: <Profile />,
-//       condition: true
-//     },
-//     {
-//       type: "collapse",
-//       name: "Sign In",
-//       key: "sign-in",
-//       icon: <Icon fontSize="small">login</Icon>,
-//       route: "/authentication/sign-in",
-//       component: <SignIn />,
-//       condition: true
-//     },
-//     // {
-//     //   type: "collapse",
-//     //   name: "Sign Up",
-//     //   key: "sign-up",
-//     //   icon: <Icon fontSize="small">assignment</Icon>,
-//     //   route: "/authentication/sign-up",
-//     //   component: <SignUp />,
-//     //   condition: true
-//     // },
-//   ].filter(route => route.condition);
-// }
 
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   // const [Routes, setRoutes] = useState(getRoutes);
@@ -167,7 +72,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     //   window.removeEventListener("storage", handleStorageChange);
     // };
   // }, []);
-  // const filteredRoutes = routes.filter(route => route.condition);
+  var filteredRoutes = routes.filter(route => route.condition);
 
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
@@ -189,7 +94,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     function handleMiniSidenav() {
       setMiniSidenav(dispatch, window.innerWidth < 1200);
       setTransparentSidenav(dispatch, window.innerWidth < 1200 ? false : transparentSidenav);
-      setWhiteSidenav(dispatch, window.innerWidth < 1200 ? false : whiteSidenav);
+      setWhiteSidenav(dispatch, window.innerWidth < 1200 ? true : whiteSidenav);
     }
 
     /** 
@@ -204,8 +109,12 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     return () => window.removeEventListener("resize", handleMiniSidenav);
   }, [dispatch, location]);
 
+
   // Render all the routes from the routes.js (All the visible items on the Sidenav)
-  const renderRoutes = routes.map(({ type, name, icon, title, noCollapse, key, href, route }) => {
+  const renderRoutes = (localStorage.getItem("vendorID") ? 
+  routes.filter(route => route && route.role && route.role.includes("Vendor")):
+  routes.filter(route => route && route.role && route.role.includes("Admin")))
+  .map(({ type, name, icon, title, noCollapse, key, href, route }) => {
     let returnValue;
 
     if (type === "collapse") {
