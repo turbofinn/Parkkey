@@ -34,6 +34,9 @@ import AddLocationIcon from '@mui/icons-material/AddLocation';
 function EmployeeTables() {
     const [employeeDetails, setemployeeDetails] = useState(["1", "2", "3"]);
     const [loading, setLoading] = useState(true);
+    const [loader, setloader] = useState({
+        open: false
+    });
     const [error, setError] = useState(null);
     const [editemployee, setEditemployee] = useState(null);
     const Name = ({ image, name, email }) => (
@@ -140,6 +143,8 @@ function EmployeeTables() {
                 employeeDetails={employeeDetails}
                 setEditemployee={setEditemployee}
                 editemployee={editemployee}
+                fetchData={fetchData}
+                setloader={setloader}
             />
             }
             <DashboardLayout>
@@ -192,7 +197,7 @@ function EmployeeTables() {
                                                 backgroundColor: 'rgba(0, 0, 0, 0)',
                                             }}
                                         >
-                                            <CircularProgress />
+                                            <CircularProgress sx={{ color: '#0066b2' }} />
                                         </Box> :
                                         <DataTable
                                             table={{ columns, rows }}

@@ -189,6 +189,7 @@ function ParkingTables() {
                 settfDialog={settfDialog}
                 component={createNewParking()}
                 setloader={setloader}
+                fetchData={fetchData}
             />
 
             }
@@ -243,7 +244,7 @@ function ParkingTables() {
                                                 backgroundColor: 'rgba(0, 0, 0, 0)',
                                             }}
                                         >
-                                            <CircularProgress />
+                                            <CircularProgress sx={{ color: '#0066b2' }}/>
                                         </Box> :
                                         <DataTable
                                             table={{ columns, rows }}

@@ -57,6 +57,7 @@ const VendorDialog = (props) => {
             const response = await axios.post(url, data, { headers });
             console.log("response", response);
             handleClose();
+            props.fetchData();
         } catch (error) {
             console.error(error);
         }
@@ -78,6 +79,7 @@ const VendorDialog = (props) => {
             .then(response => {
                 console.log("response_data", response.data);
                 handleClose();
+                props.fetchData();
             })
             .catch(error => {
                 console.error('Error:', error);

@@ -116,6 +116,7 @@ export default function MaxWidthDialog(props) {
             const response = await axios.post(url, data, { headers });
             handleLoaderfalse();
             handleClose();
+            props.fetchData();
             console.log(response.data);
         } catch (error) {
             console.error(error);
@@ -124,6 +125,7 @@ export default function MaxWidthDialog(props) {
  
 
     const handleUpdate = () =>{
+        handleLoader();
         const data = {
             parkingSpaceID: props.editparkingDetails.parkingSpaceID,
             vehicleType: vehicle,
@@ -151,6 +153,8 @@ export default function MaxWidthDialog(props) {
           .then((response) => {
             handleClose();
             console.log(response.data);
+            handleLoader();
+            props.fetchData();
           })
           .catch((error) => {
             console.error(error);

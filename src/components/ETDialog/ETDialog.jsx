@@ -38,7 +38,18 @@ const ETDialog = (props) => {
         }));
         props.setEditemployee(() => null);
     };
-
+    const handleLoader = () => {
+        props.setloader(prevState => ({
+            ...prevState,
+            open: true
+        }));
+    }
+    const handleLoaderfalse = () => {
+        props.setloader(prevState => ({
+            ...prevState,
+            open: false
+        }));
+    }
     useEffect(() => {
         if (props && props.editemployee !== null) {
             setName(props.editemployee.employeeName);
@@ -48,6 +59,7 @@ const ETDialog = (props) => {
     }, []);
 
     const handleSubmit = async () => {
+        handleLoader();
         const url = "https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/employee-onboarding";
         const data = {
             "vendorID": "d7e4e25e-8bb2-480e-a807-5e5eb8342ce9",
@@ -64,14 +76,16 @@ const ETDialog = (props) => {
         try {
             const response = await axios.post(url, data, { headers });
             console.log("response", response);
+            props.fetchData();
             handleClose();
+            handleLoaderfalse();
         } catch (error) {
             console.error(error);
         }
     }
 
     const handleUpdate = () => {
-    
+        handleLoader();
         const myHeaders = {
             "Content-Type": "application/json",
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE"
@@ -87,10 +101,12 @@ const ETDialog = (props) => {
             .then(response => {
                 console.log("response_data", response.data);
                 handleClose();
+                props.fetchData();
+                handleLoaderfalse();
             })
             .catch(error => {
                 console.error('Error:', error);
-        });
+            });
     }
     return (
         <React.Fragment>
@@ -136,20 +152,6 @@ const ETDialog = (props) => {
                         </Grid>
                     </Grid>
 
-                    {/* <Grid container spacing={2} justifyContent="evenly" alignItems="center" style={{ marginTop: '2px', marginBottom: '2px' }}>
-                        <Grid item xs={3}>
-                            <Typography variant="body1" style={{ fontSize: matches ? '0.85rem' : '0.95rem', fontFamily: 'inherit' }}>Status</Typography>
-                        </Grid>
-                        <Grid item xs={8}>
-                            <TextField
-                                style={{ margin: "1%", width: "100%" }}
-                                label="status"
-                                id="outlined-size-small"
-                                placeholder="status"
-                                size="small"
-                            />
-                        </Grid>
-                    </Grid> */}
 
                     <Grid container spacing={2} justifyContent="evenly" alignItems="center" style={{ marginTop: '2px', marginBottom: '2px' }}>
                         <Grid item xs={3}>
@@ -168,23 +170,6 @@ const ETDialog = (props) => {
                             </Select>
                         </Grid>
                     </Grid>
-
-                    {/* <Grid container spacing={2} justifyContent="evenly" alignItems="center" style={{ marginTop: '2px', marginBottom: '2px' }}>
-                        <Grid item xs={3}>
-                            <Typography variant="body1" style={{ fontSize: '0.95rem', fontFamily: 'inherit' }}>Joining Date</Typography>
-                        </Grid>
-                        <Grid item xs={6} style={{ marginLeft: '3px' }}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                    label="Joining Date"
-                                    value={selectedDate}
-                                    onChange={handleDateChange}
-                                    renderInput={(params) => <TextField {...params} variant="outlined" size="small" />}
-                                    style={{ width: '100%' }}
-                                />
-                            </LocalizationProvider>
-                        </Grid>
-                    </Grid> */}
 
                 </DialogContent>
                 <DialogActions>

@@ -167,6 +167,7 @@ const VendorTables = () => {
                 setvtDialog={setvtDialog}
                 component={createNewVendor()}
                 setloader={setloader}
+                fetchData={fetchData}
             />
 
             }
@@ -221,7 +222,7 @@ const VendorTables = () => {
                                                 backgroundColor: 'rgba(0, 0, 0, 0)',
                                             }}
                                         >
-                                            <CircularProgress />
+                                            <CircularProgress sx={{ color: '#0066b2' }} />
                                         </Box> :
                                         <DataTable
                                             table={{ columns, rows }}

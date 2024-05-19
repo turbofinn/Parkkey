@@ -13,7 +13,7 @@ import EmployeeTables from "layouts/tables/EmployeeTables";
 
 const validatonID = localStorage.getItem("vendorID");
 const adminID = localStorage.getItem("adminID");
-const routes = [
+const routes = [          
   {
     type: "collapse",
     name: "Dashboard",
