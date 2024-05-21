@@ -17,6 +17,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { Chip } from "@mui/material";
 import { useState, useEffect } from 'react';
 import axios from "axios";
+import ErrorDialog from "components/ErrorDialog/ErrorDialog";
+
 export default function MaxWidthDialog(props) {
     const [open, setOpen] = React.useState(false);
     const [fullWidth, setFullWidth] = React.useState(true);
@@ -34,6 +36,13 @@ export default function MaxWidthDialog(props) {
     const [TariffCharge, setTariffCharge] = useState(0);
     const [Rating, setRating] = useState(0);
     const [Review, setReview] = useState('');
+
+
+    const [errorchecked, setErrorcheck] = useState({
+        open: false,
+        close: true,
+        message: ''
+    });
 
     useEffect(() => {
         if (props && props.editparkingDetails !== null) {
@@ -120,7 +129,58 @@ export default function MaxWidthDialog(props) {
             props.fetchData();
             console.log(response.data);
         } catch (error) {
-            console.error(error);
+            console.error('Error:', error);
+            if (error.response && error.response.data && error.response.data.message === "Tariff charges cannot be less than Rs. 5.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Tariff charges cannot be less than Rs. 5"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Tariff time cannot be less than 0 hours.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Tariff time cannot be less than 0 hours"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Available space cannot be less than 0.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Available space cannot be less than 0"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Rating cannot be less than 0.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Rating cannot be less than 0"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Total space cannot be less than 0.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Total space cannot be less than 0"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Rating cannot be greater than 5.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Rating cannot be greater than 5"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Available space cannot be greater than total space.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Available space cannot be greater than total space"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Parking Space with same name already Exists.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Parking Space with same name already Exists"
+                }));
+            }
+        } finally {
+            handleLoaderfalse();
         }
     }
 
@@ -149,23 +209,37 @@ export default function MaxWidthDialog(props) {
         // const getBaseUrl = () => { return process.env.REACT_APP_IS_IN_PROD === "true" ? process.env.REACT_APP_BASE_URL_PROD : process.env.REACT_APP_BASE_URL_DEV;
         // }
         // console.log("url", getBaseUrl);
-        axios.put(
-            `https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/parking-space/update-parking-space-info/${props.editparkingDetails.parkingSpaceID}`,
-            data,
-            { headers: headers }
-        )
-            .then((response) => {
-                handleClose();
-                console.log(response.data);
-                handleLoader();
-                props.fetchData();
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+        try {
+            axios.put(
+                `https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/parking-space/update-parking-space-info/${props.editparkingDetails.parkingSpaceID}`,
+                data,
+                { headers: headers }
+            )
+                .then((response) => {
+                    handleClose();
+                    console.log(response.data);
+                    handleLoader();
+                    props.fetchData();
+                })
+        } catch (error) {
+            console.error('Error:', error);
+            if (error.response && error.response.data && error.response.data.message === "Parking Space ID Not present.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Parking Space ID Not present"
+                }));
+            }
+        } finally {
+            handleLoaderfalse();
+        }
     }
     return (
         <React.Fragment>
+            {
+                errorchecked.open && (<ErrorDialog message={errorchecked.message} setErrorcheck={setErrorcheck}
+                    errorchecked={errorchecked} />)
+            }
             <Dialog
                 fullWidth={fullWidth}
                 maxWidth={maxWidth}

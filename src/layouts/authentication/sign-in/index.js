@@ -47,7 +47,7 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import SuccessDialog from "components/SuccessDialog/SuccessDialog";
 import Stack from '@mui/material/Stack';
-
+import ErrorDialog from "components/ErrorDialog/ErrorDialog";
 // import Switch from '@mui/material/Switch';
 
 function Basic() {
@@ -59,6 +59,11 @@ function Basic() {
   const Navigate = useNavigate();
 
   const [checked, setChecked] = useState(true);
+  const [errorchecked, setErrorcheck] = useState({
+    open: false,
+    close: true,
+    message: ''
+  });
 
   const handleChange = (event) => {
     setChecked(event.target.checked);
@@ -91,15 +96,25 @@ function Basic() {
       ).then((res) => {
         console.log("res", res);
         handleClick();
-        setLoading(false)
+        setLoading(false);
       });
     } catch (error) {
       console.error('Error:', error);
+      if (error.response && error.response.data && error.response.data.message === "Invalid Mobile No.") {
+        setErrorcheck(prevState => ({
+          ...prevState,
+          open: true,
+          message: "Invalid Mobile No."
+        }));
+
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
   const verifyOTP = async () => {
-    if(checked){
+    if (checked) {
       try {
         setLoading(true);
         const response = await axios.post(
@@ -114,15 +129,30 @@ function Basic() {
             localStorage.setItem("refresh_token", res.data.refreshToken);
             localStorage.setItem("vendorID", res.data.vendor.vendorID);
             Navigate("/dashboard");
-          }else{
+          } else {
             Navigate("/authentication/sign-in");
           }
           setLoading(false);
         });
       } catch (error) {
         console.error('Error:', error);
+        if (error.response && error.response.data && error.response.data.message === "No vendor found in the system with this number.") {
+          setErrorcheck(prevState => ({
+            ...prevState,
+            open: true,
+            message: "No vendor found in the system with this number."
+          }))
+        }else if (error.response && error.response.data && error.response.data.message === "Invalid OTP."){
+          setErrorcheck(prevState => ({
+            ...prevState,
+            open: true,
+            message: "Invalid OTP"
+          }))
+        }
+      } finally {
+        setLoading(false);
       }
-    }else{
+    } else {
       try {
         setLoading(true);
         const response = await axios.post(
@@ -137,16 +167,31 @@ function Basic() {
             localStorage.setItem("refresh_token", res.data.refreshToken);
             localStorage.setItem("adminID", res.data.admin.adminID);
             Navigate("/dashboard");
-          }else{
+          } else {
             Navigate("/authentication/sign-in");
           }
           setLoading(false);
         });
       } catch (error) {
         console.error('Error:', error);
+        if (error.response && error.response.data && error.response.data.message === "No admin found in the system with this number.") {
+          setErrorcheck(prevState => ({
+            ...prevState,
+            open: true,
+            message: "No admin found in the system with this number."
+          }))
+        } else if (error.response && error.response.data && error.response.data.message === "Invalid OTP."){
+          setErrorcheck(prevState => ({
+            ...prevState,
+            open: true,
+            message: "Invalid OTP"
+          }))
+        }
+      } finally {
+        setLoading(false);
       }
     }
-    
+
   }
   useEffect(() => {
     if (mobile.length == 10) {
@@ -155,6 +200,10 @@ function Basic() {
   }, [mobile]);
   return (
     <BasicLayout image={bgImage}>
+      {
+        errorchecked.open && (<ErrorDialog message={errorchecked.message} setErrorcheck={setErrorcheck}
+          errorchecked={errorchecked} />)
+      }
       <Card>
         <MDBox
           variant="gradient"
@@ -199,14 +248,14 @@ function Basic() {
                 onChange={(e) => { setOTP(e.target.value) }} />
             </MDBox>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Typography style={{ fontSize:"16px", color:"blue"}}>Admin</Typography>
+              <Typography style={{ fontSize: "16px", color: "blue" }}>Admin</Typography>
               <Switch
                 checked={checked}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'controlled' }}
                 color="blue"
               />
-              <Typography style={{ fontSize:"16px", color:"green"}}>Vendor</Typography>
+              <Typography style={{ fontSize: "16px", color: "green" }}>Vendor</Typography>
             </Stack>
 
 

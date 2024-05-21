@@ -17,6 +17,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState, useEffect } from 'react';
 import axios from "axios";
+import ErrorDialog from "components/ErrorDialog/ErrorDialog";
+
 const ETDialog = (props) => {
     const [open, setOpen] = React.useState(false);
     const [fullWidth, setFullWidth] = React.useState(true);
@@ -24,13 +26,17 @@ const ETDialog = (props) => {
     const matches = useMediaQuery('(max-width:600px)');
 
 
-    const [name, setName] = useState('');
-    const [mobileNo, setMobileNo] = useState('');
-    const [gender, setGender] = useState('');
+    const [name, setName] = useState(null);
+    const [mobileNo, setMobileNo] = useState(null);
+    const [gender, setGender] = useState(null);
     const [parkingName, setParkingName] = useState('');
     const [parkingList, setparkingList] = useState([]);
     const [parkingIndex, setparkingIndex] = useState('');
-
+    const [errorchecked, setErrorcheck] = useState({
+        open: false,
+        close: true,
+        message: ''
+    });
 
 
     const handleClose = () => {
@@ -105,11 +111,44 @@ const ETDialog = (props) => {
             handleClose();
             handleLoaderfalse();
         } catch (error) {
-            console.error(error);
+            console.error('Error:', error);
+            if (error.response && error.response.data && error.response.data.message === "INVALID_INPUTS") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Invalid Inputs"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Invalid mobile Number") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Invalid mobile Number"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Invalid Gender") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Invalid Gender"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Invalid name") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Invalid name"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Employee with this mobile Number already present.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Employee with this mobile Number already present"
+                }));
+            }
+        } finally {
+            handleLoaderfalse();
         }
     }
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         handleLoader();
         const myHeaders = {
             "Content-Type": "application/json",
@@ -122,19 +161,61 @@ const ETDialog = (props) => {
             gender: gender,
         };
 
-        axios.put(`https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/employee/update-employee-info/${props.editemployee.employeeID}`, data, { headers: myHeaders })
-            .then(response => {
-                console.log("response_data", response.data);
-                handleClose();
-                props.fetchData();
-                handleLoaderfalse();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
+        try {
+            const response = await axios.put(
+                `https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/employee/update-employee-info/${props.editemployee.employeeID}`,
+                data,
+                { headers: myHeaders }
+            );
+            console.log("response_data", response.data);
+            handleClose();
+            props.fetchData();
+        } catch (error) {
+            if (error.response && error.response.data) {
+                const errorMessage = error.response.data.message;
+                let displayMessage = '';
+
+                switch (errorMessage) {
+                    case "INVALID_INPUTS":
+                        displayMessage = "Invalid Inputs";
+                        break;
+                    case "Emp ID Not present.":
+                        displayMessage = "Emp ID Not present";
+                        break;
+                    case "Invalid mobile no.":
+                        displayMessage = "Invalid mobile no";
+                        break;
+                    case "Invalid name":
+                        displayMessage = "Invalid name";
+                        break;
+                    default:
+                        displayMessage = "An error occurred";
+                        break;
+                }
+
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: displayMessage
+                }));
+            } else {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "An unexpected error occurred"
+                }));
+            }
+        } finally {
+            handleLoaderfalse();
+        }
+    };
+
     return (
         <React.Fragment>
+            {
+                errorchecked.open && (<ErrorDialog message={errorchecked.message} setErrorcheck={setErrorcheck}
+                    errorchecked={errorchecked} />)
+            }
             <Dialog
                 fullWidth={fullWidth}
                 maxWidth={maxWidth}
@@ -206,17 +287,17 @@ const ETDialog = (props) => {
                                 placeholder="parking name"
                                 size="small"
                                 value={parkingName}
-                                onChange={(e) => { 
+                                onChange={(e) => {
                                     setParkingName(e.target.value);
                                 }}>
                                 {
                                     parkingList && parkingList.map((data, index) => {
                                         return (
-                                            <MenuItem value={data.parkingName} onClick={()=>{
+                                            <MenuItem value={data.parkingName} onClick={() => {
                                                 setparkingIndex(data.parkingSpaceID);
                                             }}>{data.parkingName}</MenuItem>
                                         )
-                                    }) 
+                                    })
                                 }
                             </Select>
                         </Grid>

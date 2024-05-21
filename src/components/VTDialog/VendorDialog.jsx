@@ -17,6 +17,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState, useEffect } from 'react';
 import axios from "axios";
+import ErrorDialog from "components/ErrorDialog/ErrorDialog";
+
 const VendorDialog = (props) => {
     const [open, setOpen] = React.useState(false);
     const [fullWidth, setFullWidth] = React.useState(true);
@@ -25,6 +27,11 @@ const VendorDialog = (props) => {
 
     const [name, setName] = useState('');
     const [mobileNo, setMobileNo] = useState('');
+    const [errorchecked, setErrorcheck] = useState({
+        open: false,
+        close: true,
+        message: ''
+    });
 
     const handleClose = () => {
         props.setvtDialog(prevState => ({
@@ -39,7 +46,7 @@ const VendorDialog = (props) => {
         if (props && props.editvendorDetails !== null) {
             setName(props.editvendorDetails.vendorName);
             setMobileNo(props.editvendorDetails.mobileNo);
-        }  
+        }
     }, []);
 
     const token = localStorage.getItem("token");
@@ -51,7 +58,7 @@ const VendorDialog = (props) => {
         };
         const headers = {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` 
+            "Authorization": `Bearer ${token}`
         };
         try {
             const response = await axios.post(url, data, { headers });
@@ -59,34 +66,77 @@ const VendorDialog = (props) => {
             handleClose();
             props.fetchData();
         } catch (error) {
-            console.error(error);
+            console.error('Error:', error);
+            if (error.response && error.response.data && error.response.data.message === "Please enter vendorName and Mobile No.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Please enter vendorName and Mobile No"
+                }));
+            } else if (error.response && error.response.data && error.response.data.message === "Vendor with this mobile number already present.") {
+                setErrorcheck(prevState => ({
+                    ...prevState,
+                    open: true,
+                    message: "Vendor with this mobile number already present"
+                }));
+            }
+        } finally {
+            // handleLoaderfalse();
         }
     }
 
-    const handleUpdate = () => {
-
+    const handleUpdate = async () => {
         const myHeaders = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbi10b2tlbiIsInVzZXJUeXBlIjoiVkVORE9SIiwiaXNzIjoiUGFya2tleSIsInN1YiI6ImI5MDI0YTIxLWM4ZjktNDJkMC1hOTNhLWNmODc5NGRhNGQzNyIsImp0aSI6IjRmMTViNTIwLWUyNzktNGU5MS05ODUwLWI5OGFkMmU3MTU0MiIsImlhdCI6MTcxNTA1MDI0MiwiZXhwIjoyMDMwNDEwMjQyfQ.2Vamt4FXCMT25aZxwvAaOybzKYfCn18R3JIYahUp4tE"
+            "Authorization": `Bearer ${token}`
         };
-
+    
         const data = {
             vendorName: name,
             mobileNo: mobileNo,
         };
-
-        axios.put(`https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/vendor/update-vendor-info/${props.editvendorDetails.vendorID}`, data, { headers: myHeaders })
-            .then(response => {
-                console.log("response_data", response.data);
-                handleClose();
-                props.fetchData();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
+    
+        try {
+            const response = await axios.put(`https://xkzd75f5kd.execute-api.ap-south-1.amazonaws.com/prod/user-management/vendor/update-vendor-info/${props.editvendorDetails.vendorID}`, data, { headers: myHeaders });
+            console.log("response_data", response.data);
+            handleClose();
+            props.fetchData();
+        } catch (error) {
+            // console.error('Error:', error);
+            if (error.response && error.response.data) {
+                const errorMessage = error.response.data.message;
+                if (errorMessage === "Vendor ID Not present.") {
+                    setErrorcheck(prevState => ({
+                        ...prevState,
+                        open: true,
+                        message: "Vendor ID Not present"
+                    }));
+                } else if (errorMessage === "Invalid mobile no.") {
+                    setErrorcheck(prevState => ({
+                        ...prevState,
+                        open: true,
+                        message: "Invalid mobile no"
+                    }));
+                } else if (errorMessage === "Invalid Name.") {
+                    setErrorcheck(prevState => ({
+                        ...prevState,
+                        open: true,
+                        message: "Invalid Name"
+                    }));
+                }
+            }
+        } finally {
+            // Uncomment this if you have a loader to handle
+            // handleLoaderfalse();
+        }
+    };
+    
     return (
         <React.Fragment>
+            {
+                errorchecked.open && (<ErrorDialog message={errorchecked.message} setErrorcheck={setErrorcheck}
+                    errorchecked={errorchecked} />)
+            }
             <Dialog
                 fullWidth={fullWidth}
                 maxWidth={maxWidth}
